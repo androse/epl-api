@@ -1,4 +1,5 @@
 require 'net/http'
+require 'json'
 
 module EplApi
   class HttpClient
@@ -12,7 +13,7 @@ module EplApi
 
     def get
       res = Net::HTTP.get_response(uri)
-      res.body if res.is_a?(Net::HTTPSuccess)
+      JSON.parse(res.body) if res.is_a?(Net::HTTPSuccess)
     end
 
     def self.get(uri, params)
