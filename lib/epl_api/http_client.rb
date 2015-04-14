@@ -6,9 +6,8 @@ module EplApi
 
     attr_reader :uri
 
-    def initialize(uri, params)
+    def initialize(uri)
       @uri = URI(uri)
-      @uri.query = URI.encode_www_form(params)
     end
 
     def get
@@ -16,8 +15,8 @@ module EplApi
       JSON.parse(res.body) if res.is_a?(Net::HTTPSuccess)
     end
 
-    def self.get(uri, params)
-      http_client = HttpClient.new(uri, params)
+    def self.get(uri)
+      http_client = HttpClient.new(uri)
       http_client.get()
     end
 
