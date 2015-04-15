@@ -1,7 +1,7 @@
 module EplApi
-  class LeagueTableFetcher < Fetcher
+  class LeagueTable < Fetcher
 
-    def league_table(options = {})
+    def details(options = {})
       # 38th (last) week will always return the current league table
       options = {
          match_day_id: options[:week] || 38

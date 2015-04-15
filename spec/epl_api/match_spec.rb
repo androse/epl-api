@@ -1,89 +1,94 @@
 require 'spec_helper'
 
-describe EplApi::MatchFetcher do
+describe EplApi::Match do
 
-  describe '#week_matches' do
-    it 'should call fetch with the given week and correct data_name' do
-      mf = described_class.new()
-      week = 3
-      data = double()
-      allow(mf).to receive(:fetch).and_return(data)
-      allow(mf).to receive(:parse_week_data)
-
-      expect(mf).to receive(:fetch).
-        with({ game_week_id: week }, 'scores.json' )
-      expect(mf).to receive(:parse_week_data).with(data)
-      mf.week_matches(week)
-    end
-  end
-
-  describe '#match' do
+  describe '#details' do
     it 'should call fetch with the given week and id, and correct data_name' do
-      mf = described_class.new()
       week = 3
       id = 5
+      match = described_class.new(week, id)
       data = double()
-      allow(mf).to receive(:fetch).and_return(data)
-      allow(mf).to receive(:parse_data)
 
-      expect(mf).to receive(:fetch).
+      allow(match).to receive(:fetch).and_return(data)
+      allow(described_class).to receive(:parse_data)
+
+      expect(match).to receive(:fetch).
         with({ match_day_id: week, match_id: id }, 'match-details.json' )
-      expect(mf).to receive(:parse_data).with(data)
-      mf.match(week, id)
+      expect(described_class).to receive(:parse_data).with(data)
+      match.details
     end
   end
 
-  describe '#match_commentary' do
+  describe '#commentary' do
     it 'should call fetch with the given week and id, and correct data_name' do
-      mf = described_class.new()
       week = 3
       id = 5
+      match = described_class.new(week, id)
       data = double()
-      allow(mf).to receive(:fetch).and_return(data)
-      allow(mf).to receive(:parse_commentary_data)
 
-      expect(mf).to receive(:fetch).
+      allow(match).to receive(:fetch).and_return(data)
+      allow(match).to receive(:parse_commentary_data)
+
+      expect(match).to receive(:fetch).
         with({ match_day_id: week, match_id: id }, 'text-commentary.json' )
-      expect(mf).to receive(:parse_commentary_data).with(data)
-      mf.match_commentary(week, id)
+      expect(described_class).to receive(:parse_commentary_data).with(data)
+      match.commentary
     end
   end
 
-  describe '#match_lineups' do
+  describe '#lineups' do
     it 'should call fetch with the given week and id, and correct data_name' do
-      mf = described_class.new()
       week = 3
       id = 5
+      match = described_class.new(week, id)
       data = double()
-      allow(mf).to receive(:fetch).and_return(data)
-      allow(mf).to receive(:parse_data)
 
-      expect(mf).to receive(:fetch).
+      allow(match).to receive(:fetch).and_return(data)
+      allow(described_class).to receive(:parse_data)
+
+      expect(match).to receive(:fetch).
         with({ match_day_id: week, match_id: id }, 'lineups.json' )
-      expect(mf).to receive(:parse_data).with(data)
-      mf.match_lineups(week, id)
+      expect(described_class).to receive(:parse_data).with(data)
+      match.lineups
     end
   end
 
-  describe '#match_stats' do
+  describe '#stats' do
     it 'should call fetch with the given week and id, and correct data_name' do
-      mf = described_class.new()
       week = 3
       id = 5
+      match = described_class.new(week, id)
       data = double()
-      allow(mf).to receive(:fetch).and_return(data)
-      allow(mf).to receive(:parse_data)
+      
+      allow(match).to receive(:fetch).and_return(data)
+      allow(described_class).to receive(:parse_data)
 
-      expect(mf).to receive(:fetch).
+      expect(match).to receive(:fetch).
         with({ match_day_id: week, match_id: id }, 'live-stats.json' )
-      expect(mf).to receive(:parse_data).with(data)
-      mf.match_stats(week, id)
+      expect(described_class).to receive(:parse_data).with(data)
+      match.stats
     end
   end
 
-  describe '#parse_week_data' do
+  describe '::all_in_week' do
+    it 'should call fetch with the given week and correct data_name' do
+      fetcher = instance_double('EplApi::Fetcher')
+      week = 3
+      data = double()
+
+      allow(described_class.superclass).to receive(:new).and_return(fetcher)
+      allow(fetcher).to receive(:fetch).and_return(data)
+      allow(described_class).to receive(:parse_week_data)
+
+      expect(fetcher).to receive(:fetch).
+        with({ game_week_id: week }, 'scores.json' )
+      expect(described_class).to receive(:parse_week_data).with(data)
+      described_class.all_in_week(week)
+    end
+  end
+
+  describe '::parse_week_data' do
     it 'should return a single array of matches' do
-      mf = described_class.new()
       day1_data = double()
       day2_data = double()
       day3_data = double()
@@ -96,24 +101,22 @@ describe EplApi::MatchFetcher do
       }
 
       expected_output = [day1_data, day2_data, day3_data]
-      expect(mf.parse_week_data(data)).to eq expected_output
+      expect(described_class.parse_week_data(data)).to eq expected_output
     end
   end
 
 
-  describe '#parse_data' do
+  describe '::parse_data' do
     it 'should return just the match data' do
-      mf = described_class.new()
       expected_data = double()
       data = { "Data" => expected_data }
 
-      expect(mf.parse_data(data)).to eq expected_data
+      expect(described_class.parse_data(data)).to eq expected_data
     end
   end
 
-  describe '#parse_commentary_data' do
+  describe '::parse_commentary_data' do
     it 'should return the commentary data with verbose types' do
-      mf = described_class.new()
       data = {
         "Data" => [
           { "CommentTypeId" => 1, "MatchPeriodId" => 1 },
@@ -187,7 +190,7 @@ describe EplApi::MatchFetcher do
       ]
 
 
-      expect(mf.parse_commentary_data(data)).to eq expected_output
+      expect(described_class.parse_commentary_data(data)).to eq expected_output
     end
   end
 
