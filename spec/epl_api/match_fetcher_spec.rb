@@ -62,4 +62,101 @@ describe EplApi::MatchFetcher do
     end
   end
 
+  describe '#match_commentary' do
+    it 'should call fetch with the given week and id, and correct data_name' do
+      mf = described_class.new()
+      week = 3
+      id = 5
+      data = double()
+      allow(mf).to receive(:fetch).and_return(data)
+      allow(mf).to receive(:parse_commentary_data)
+
+      expect(mf).to receive(:fetch).
+        with({ match_day_id: week, match_id: id }, 'text-commentary.json' )
+      expect(mf).to receive(:parse_commentary_data).with(data)
+      mf.match_commentary(week, id)
+    end
+  end
+
+  describe '#parse_commentary_data' do
+    it 'should return the commentary data with verbose types' do
+      mf = described_class.new()
+      commentary_data = double()
+      data = {
+        "Data" => [
+          { "CommentTypeId" => 1, "MatchPeriodId" => 1 },
+          { "CommentTypeId" => 2, "MatchPeriodId" => 2 }
+        ],
+        "MetaData" => {
+          "TextCommentaryTypes" => [
+            {
+              "FamilyType" => "TextCommentaryTypes",
+              "TypeId" => 1,
+              "Name" => "Goal",
+              "Code" => "",
+              "Description" => "Goal"
+            },
+            {
+              "FamilyType" => "TextCommentaryTypes",
+              "TypeId" => 2,
+              "Name" => "Miss",
+              "Code" => "",
+              "Description" => "Shoot off target"
+            }
+          ],
+          "PeriodTypes" => [
+            {
+              "FamilyType" => "PeriodTypes",
+              "TypeId" => 1,
+              "Name" => "FirstHalf",
+              "Code" => "FH",
+              "Description" => "First Half"
+            },
+            {
+              "FamilyType" => "PeriodTypes",
+              "TypeId" => 2,
+              "Name" => "SecondHalf",
+              "Code" => "SH",
+              "Description" => "Second Half"
+            }
+          ]
+        }
+      }
+
+      expected_output = [
+        {
+          "CommentType" => {
+            "TypeId" => 1,
+            "Name" => "Goal",
+            "Code" => "",
+            "Description" => "Goal"
+          },
+          "MatchPeriod" => {
+            "TypeId" => 1,
+            "Name" => "FirstHalf",
+            "Code" => "FH",
+            "Description" => "First Half"
+          }
+        },
+        {
+          "CommentType" => {
+            "TypeId" => 2,
+            "Name" => "Miss",
+            "Code" => "",
+            "Description" => "Shoot off target"
+          },
+          "MatchPeriod" => {
+            "TypeId" => 2,
+            "Name" => "SecondHalf",
+            "Code" => "SH",
+            "Description" => "Second Half"
+          }
+        }
+      ]
+
+
+      expect(mf.parse_commentary_data(data)).to eq expected_output
+    end
+  end
+
 end
