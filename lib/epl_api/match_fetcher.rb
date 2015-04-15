@@ -13,5 +13,18 @@ module EplApi
       data["Data"].map { |d| d["Scores"] }.flatten
     end
 
+    def match(week, id)
+      options = {
+         match_day_id: week,
+         match_id: id
+      }
+
+      parse_match_data fetch(options, 'match-details.json')
+    end
+
+    def parse_match_data(data)
+      data["Data"]
+    end
+
   end
 end
