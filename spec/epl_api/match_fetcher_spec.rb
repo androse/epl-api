@@ -65,6 +65,22 @@ describe EplApi::MatchFetcher do
     end
   end
 
+  describe '#match_stats' do
+    it 'should call fetch with the given week and id, and correct data_name' do
+      mf = described_class.new()
+      week = 3
+      id = 5
+      data = double()
+      allow(mf).to receive(:fetch).and_return(data)
+      allow(mf).to receive(:parse_data)
+
+      expect(mf).to receive(:fetch).
+        with({ match_day_id: week, match_id: id }, 'live-stats.json' )
+      expect(mf).to receive(:parse_data).with(data)
+      mf.match_stats(week, id)
+    end
+  end
+
   describe '#parse_week_data' do
     it 'should return a single array of matches' do
       mf = described_class.new()

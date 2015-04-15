@@ -36,6 +36,14 @@ module EplApi
       parse_data fetch(options, 'lineups.json')
     end
 
+    def match_stats(week, id)
+      options = {
+         match_day_id: week,
+         match_id: id
+      }
+
+      parse_data fetch(options, 'live-stats.json')
+    end
 
     # Parsing methods
 
