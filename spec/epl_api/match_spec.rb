@@ -59,7 +59,7 @@ describe EplApi::Match do
       id = 5
       match = described_class.new(week, id)
       data = double()
-      
+
       allow(match).to receive(:fetch).and_return(data)
       allow(described_class).to receive(:parse_data)
 
@@ -67,6 +67,38 @@ describe EplApi::Match do
         with({ match_day_id: week, match_id: id }, 'live-stats.json' )
       expect(described_class).to receive(:parse_data).with(data)
       match.stats
+    end
+  end
+
+  describe 'caching data' do
+    it 'should return the previously fetched result' do
+      week = 3
+      id = 5
+      match = described_class.new(week, id)
+      data = double()
+
+      allow(match).to receive(:fetch)
+      allow(described_class).to receive(:parse_data).and_return(data)
+      match.details
+
+      expect(match).not_to receive(:fetch)
+      match.details
+    end
+
+    context 'force is true' do
+      it 'should refetch data' do
+        week = 3
+        id = 5
+        match = described_class.new(week, id)
+        data = double()
+
+        allow(match).to receive(:fetch)
+        allow(described_class).to receive(:parse_data).and_return(data)
+        match.details
+
+        expect(match).to receive(:fetch)
+        match.details(true)
+      end
     end
   end
 

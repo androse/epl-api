@@ -7,40 +7,56 @@ module EplApi
       @id = id
     end
 
-    def details
-      options = {
-         match_day_id: @week,
-         match_id: @id
-      }
+    def details(force = false)
+      if !@details || force
+        options = {
+           match_day_id: @week,
+           match_id: @id
+        }
 
-      self.class.parse_data fetch(options, 'match-details.json')
+        @details = self.class.parse_data fetch(options, 'match-details.json')
+      end
+
+      @details
     end
 
-    def commentary
-      options = {
-        match_day_id: @week,
-        match_id: @id
-      }
+    def commentary(force = false)
+      if !@commentary || force
+        options = {
+          match_day_id: @week,
+          match_id: @id
+        }
 
-      self.class.parse_commentary_data fetch(options, 'text-commentary.json')
+        self.class.parse_commentary_data fetch(options, 'text-commentary.json')
+      end
+
+      @commentary
     end
 
-    def lineups
-      options = {
-         match_day_id: @week,
-         match_id: @id
-      }
+    def lineups(force = false)
+      if !@lineups || force
+        options = {
+           match_day_id: @week,
+           match_id: @id
+        }
 
-      self.class.parse_data fetch(options, 'lineups.json')
+        self.class.parse_data fetch(options, 'lineups.json')
+      end
+
+      @lineups
     end
 
-    def stats
-      options = {
-         match_day_id: @week,
-         match_id: @id
-      }
+    def stats(force = false)
+      if !@stats || force
+        options = {
+           match_day_id: @week,
+           match_id: @id
+        }
 
-      self.class.parse_data fetch(options, 'live-stats.json')
+        self.class.parse_data fetch(options, 'live-stats.json')
+      end
+
+      @stats
     end
 
     def self.all_in_week(week)
