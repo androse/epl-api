@@ -1,9 +1,7 @@
-require "epl_api/version"
-require "epl_api/fetcher"
-require "epl_api/league_table"
-require "epl_api/match"
-require "epl_api/http_client"
-require "epl_api/utils"
+# require all in /epl_api
+Dir[File.dirname(__FILE__) + '/epl_api/*.rb'].each do |file|
+  require file
+end
 
 module EplApi
   # Your code goes here...
