@@ -1,16 +1,24 @@
 module EplApi
   class LeagueTable < Fetcher
 
-    def details(options = {})
-      # 38th (last) week will always return the current league table
-      options = {
-         match_day_id: options[:week] || 38
-      }
-
-      parse_data fetch(options, 'league-table.json')
+    def initialize(week, options = {})
+      super(options)
+      @week = week
     end
 
-    def parse_data(data)
+    def details(force = false)
+      if !@details || force
+        options = {
+           match_day_id: @week
+        }
+
+        @details = parse_data fetch(options, 'league-table.json')
+      end
+
+      @details
+    end
+
+    def self.parse_data(data)
       data["Data"]
     end
 
